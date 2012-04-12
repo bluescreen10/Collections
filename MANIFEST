@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Collections/Ordered.pm
+lib/Collections/Set.pm
+lib/Collections/Sorted.pm
+t/00-load.t
+t/01-ordered-basic.t
+t/02-ordered.t
+t/03-set.t
+t/04-sorted.t
+t/pod-coverage.t
+t/pod.t
