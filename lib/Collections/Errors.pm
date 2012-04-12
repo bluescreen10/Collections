@@ -10,9 +10,12 @@ Version 0.01
 
      try {
         $collection->detect($not_existent_element);
-     } catch Collections::Error::ElementNotFound with {
-        # Element not found block
-        print 'element does not exists';
+     } catch {
+        my $e = shift;
+        if (ref($e) eq 'Collections::Error::ElementNotFound') {
+            # Element not found block
+            print 'element does not exists';
+        }
      };
 
 =head1 AUTHOR
@@ -34,11 +37,57 @@ under the same terms as Perl itself.
 
 =cut
 
+package Collections::Errors;
+
+use strict;
+use warnings;
+use Carp qw(cluck carp croak);
+use Class::Accessor::Fast "antlers";
+
+use overload '""' => \&stringify, fallback => 1;
+
+our $ERROR_DEBUG = 0;
+our $VERSION     = '0.02';
+
+has 'msg' => ( is => 'rw', isa => 'Str' );
+has 'pkg' => ( is => 'rw', isa => 'Str' );
+
+sub throw {
+
+    my $class = shift;
+    my $msg   = shift;
+
+    my ( $pkg, $file, $line ) = caller(1);
+
+    if ($ERROR_DEBUG) {
+
+        carp "ERROR THROWN IN: $pkg ($msg) Line: $line\n";
+        cluck 'STACKTRACE';
+
+    }
+
+    my $self = { pkg => $pkg, msg => $msg };
+    bless $self, $class;
+
+    croak $self;
+
+}
+
+sub stringify {
+    my $self = shift;
+    my $text = $self->msg;
+    return $text . "\n" . '';
+}
+
+1;
+
+################################################################################
+
 package Collections::Error::ElementNotFound;
 
 use strict;
 use warnings;
-use base qw(Error::Simple);
+use base qw(Collections::Errors);
 1;
 
 #################################################################################
@@ -47,7 +96,7 @@ package Collections::Error::InvalidArgument;
 
 use strict;
 use warnings;
-use base qw(Error::Simple);
+use base qw(Collections::Errors);
 1;
 #################################################################################
 
@@ -55,8 +104,5 @@ use base qw(Error::Simple);
 package Collections::Error::InvalidSize;
 use strict;
 use warnings;
-use base qw(Error::Simple);
+use base qw(Collections::Errors);
 1;
-
-#################################################################################
-

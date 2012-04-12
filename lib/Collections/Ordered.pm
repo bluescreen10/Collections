@@ -443,6 +443,14 @@ sub to_array {
     }
 }
 
+sub to_perl_array {
+    return shift->to_array
+}
+
+sub each {
+    return shift->to_array
+}
+
 =head2 to_ordered()
 
 Returns the same object
